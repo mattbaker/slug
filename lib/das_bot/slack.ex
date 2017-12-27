@@ -55,9 +55,9 @@ defmodule DasBot.Slack do
     |> Map.values()
     |> Enum.find(&match?(%{name: ^channel_name}, &1))
     |> case do
-         nil -> {:reply, {:error, "Not Found"}, state}
-         channel -> {:reply, channel, state}
-       end
+      nil -> {:reply, {:error, "Not Found"}, state}
+      channel -> {:reply, channel, state}
+    end
   end
 
   def handle_call({:add_reaction, channel, ts, reaction}, _from, %{token: token} = state) do
