@@ -4,7 +4,7 @@ defmodule DasBot.MixProject do
   def project do
     [
       app: :das_bot,
-      version: "0.1.0",
+      version: "0.1.1",
       name: "DasBot",
       description: "Like Plug, but for Slack Bots.",
       package: package(),
