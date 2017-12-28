@@ -1,30 +1,21 @@
 # DasBot
 
 DasBot is like [Plug](https://github.com/elixir-plug/plug), but for Slack.
+Your bot module defines a pipeline of functions (slugs) that receive events from Slack. Each slug can take actions in response to the events it receives, and may optionally add metadata to an event for other slugs to use downstream. This is similar to Plug and its `conn` object.
 
-Online documentation is available [here](https://hexdocs.pm/das_bot).
+DasBot connects and communicates over websocket using Slack's [RTM API](https://api.slack.com/rtm). A simple `DasBot.Slack` process also provides access to a few handy Web API calls, and maintains a cache of user and channel information for quick lookups.
 
-## Example
+Hex docs for DasBot are available [here](https://hexdocs.pm/das_bot).
+
+## Installation and example
+
+Start a new project.
 
 ```elixir
-defmodule MyBot do
-  use DasBot.Bot
-
-  slug(DasBot.Slug.Common.MessagesOnly)
-  slug(DasBot.Slug.Common.CheckMentioned)
-  slug(:simple_reply)
-
-  def simple_reply(%DasBot.Event{data: %{user: user_id}, metadata: %{mentioned: true}} = event) do
-    DasBot.Bot.send_to_channel(__MODULE__, "general", "Oh hey, <@\#{user_id}>!")
-    event
-  end
-  def simple_reply(event), do: event
-end
+mix new bot_family --sup
 ```
 
-## Installation
-
-Add DasBot to your project's dependencies.
+Add `DasBot` to your deps, then run `mix deps.get`.
 
 ```elixir
 def deps do
@@ -34,17 +25,85 @@ def deps do
 end
 ```
 
-Start your bot as a worker in your OTP application, passing your slack bot API token as an argument.
+#### Create your Bot
+Create a new module for your bot, pull in `DasBot.Bot`, and define a simple pipeline of slugs.
 
 ```elixir
-defmodule MyBot.Application do
+# lib/bot_family/my_bot.ex
+defmodule BotFamily.MyBot do
+  use DasBot.Bot
+
+  slug(DasBot.Slug.Common.MessagesOnly)
+  slug(DasBot.Slug.Common.CheckMentioned)
+  slug(:simple_reply)
+
+  def simple_reply(%DasBot.Event{data: event_data, metadata: %{mentioned: true}} = event) do
+    %{user: user_id, channel: channel_id} = event_data
+    DasBot.Bot.send_text(__MODULE__, channel_id, "Oh hey, <@#{user_id}>!")
+    event
+  end
+
+  def simple_reply(event), do: event
+end
+```
+
+What's going on here? In our example bot we're using the included `DasBot.Slug.Common.MessagesOnly` slug module to filter out events that are _not_ message events. 
+
+Next we use the included `DasBot.Slug.Common.MessagesOnly` slug, which will check to see if our bot was mentioned in the message we just received. It will add a `mentioned` key to the metadata. 
+
+Finally, we supply our own slug called `simple_reply`. If it's been mentioned, it will send a reply to the user that mentioned it in the channel using `DasBot.Bot.send_text/3`. If not, it will simply pass the event along.
+
+Check out the documentation in the `DasBot.Slug` module for more information on creating your own slugs.
+
+#### Configure your keys
+Before we try out our bot, we need to configure the api keys for our bot in `confix/config.exs`, and for the Slack Web API. In our case, we'll use the same token for both.
+
+```elixir
+# config/config.exs
+use Mix.Config
+
+config :das_bot,
+  keys: %{
+    :web_api => "xoxb-your-key",
+    BotFamily.MyBot => "xoxb-your-key"
+  }
+```
+
+#### Hello World.
+
+Now let's boot our bot in `iex`. **Make sure your bot has been invited to, and joined, the channel you are using.**
+
+```bash
+$ iex -S mix
+iex(1)> BotFamily.MyBot.start_link()
+
+10:52:55.558 [info]  Elixir.MyBot: Initializing Websocket
+{:ok, #PID<0.253.0>}
+
+iex(1)> DasBot.Bot.send_to_channel(BotFamily.MyBot, "general", "hello world")
+```
+
+Check out the documentation in the `DasBot.Bot` module for more information on sending messages from your bot.
+
+#### Test your slug pipeline
+
+You should see a "hello world" from your bot in `#general` (assuming the bot is in that channel).
+
+Let's test our slug pipeline. Try mentioning the bot by name in your Slack channel. For example, "Hello @mybot" (use the name of the bot you specified when you created the integration in Slack). You should see a reply.
+
+#### Add your bot as a worker
+As a last step, you probably want to add your bot as a worker to your `application.ex` instead of starting the bot explicitly.
+
+```elixir
+# lib/application.ex
+defmodule BotFamily.Application do
   @moduledoc false
 
   use Application
 
   def start(_type, _args) do
-    children = [{MyBot, token: "xoxb-my-bot-token"}]
-    opts = [strategy: :one_for_one, name: MyBot.Supervisor]
+    children = [BotFamily.MyBot]
+    opts = [strategy: :one_for_one, name: BotFamily.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

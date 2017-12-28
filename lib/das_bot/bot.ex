@@ -1,41 +1,8 @@
 defmodule DasBot.Bot do
   @moduledoc """
   This module can be `use`-d into a module in order to define a Slack bot.
-
-  The behavior of a bot is defined by its pipeline of `DasBot.Slug`s.
-
-  ```
-  defmodule MyBot do
-    use DasBot.Bot
-
-    slug(DasBot.Slug.Common.MessagesOnly) # Filter out events that are not messages.
-    slug(DasBot.Slug.Common.CheckMentioned) # Check if the bot has been mentioned.
-    slug(:simple_reply) # An implementation of a function-based `DasBot.Slug`.
-
-    def simple_reply(%DasBot.Event{data: %{user: user_id}, metadata: %{mentioned: true}} = event) do
-      DasBot.Bot.send_to_channel(__MODULE__, "general", "Oh hey, <@\#{user_id}>!")
-      event
-    end
-
-    # Simply pass along the event if our clause above does not match
-    def simple_reply(event), do: event
-  end
-  ```
-
-  See the `DasBot.Slug` specification for more information on creating your own
-  slugs.
-  """
-
-  @doc """
-  Runs when the bot's websocket connection to Slack is first established. This callback is optional.
-
-  ## Example
-  ```
-  def on_connect(state) do
-    IO.puts("I have connected!")
-    {:ok, state}
-  end
-  ```
+  It also includes functions for sending messages and events from a bot to
+  a slack channel.
   """
   @callback on_connect(state :: state) :: {atom, state}
   @optional_callbacks on_connect: 1
@@ -106,9 +73,9 @@ defmodule DasBot.Bot do
       @keepalive 10_000
 
       # Client
-      def start_link({:token, bot_token}) do
-        # hmmm...
-        start_websocket(bot_token, !!System.get_env("NO_BOT_START"))
+      def start_link() do
+        DasBot.get_api_token(__MODULE__)
+        |> start_websocket(!!System.get_env("NO_BOT_START"))
       end
 
       defp start_websocket(bot_token, false) do

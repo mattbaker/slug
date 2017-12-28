@@ -1,20 +1,19 @@
 defmodule DasBot.Slack do
+  @moduledoc """
+  This module provides access to a few Slack Web API calls, as well as maintaining
+  a cache of user and channel information for quick lookups.
+  """
   use GenServer
   require Logger
 
   # Client
   @doc false
-  def start_link(token: token) do
+  def start_link([]) do
+    token = DasBot.get_api_token(:web_api)
     GenServer.start_link(__MODULE__, token, name: __MODULE__)
   end
 
-  @doc """
-  Invoked when the `DasBot.Slack` GenServer is started. Expects
-  a Slack API token.
-
-  A list of users and channels will be fetched and cached when `init()`
-  runs.
-  """
+  @doc false
   @spec init(token :: String.t()) :: {:ok, %{}}
   def init(token) do
     state = %{
@@ -39,7 +38,27 @@ defmodule DasBot.Slack do
   """
   @spec get_rtm_connection(String.t()) :: {String.t(), String.t(), String.t()}
   def get_rtm_connection(bot_token) do
-    GenServer.call(__MODULE__, {:get_rtm_connection, bot_token})
+    %{url: url, self: %{id: id, name: name}} = post("rtm.connect", bot_token)
+    {url, id, name}
+  end
+
+  @doc """
+  Posts a message through the [Slack REST API](https://api.slack.com/methods/chat.postMessage)
+  instead of via Websocket.
+
+  Helpful if you need to post a message with fancy formatting, which is not currently supported
+  via the RTM API.
+  """
+  @spec post_message(String.t(), String.t(), String.t(), String.t(), []) :: %{}
+  def post_message(token, author, channel, text, attachments \\ []) do
+    data = [
+      channel: channel,
+      text: text,
+      as_user: author,
+      attachments: attachments |> Poison.encode!()
+    ]
+
+    post("chat.postMessage", token, data)
   end
 
   @doc """
@@ -86,30 +105,7 @@ defmodule DasBot.Slack do
     GenServer.call(__MODULE__, {:add_reaction, channel, message_timestamp, reaction})
   end
 
-  @doc """
-  Posts a message through the [Slack REST API](https://api.slack.com/methods/chat.postMessage)
-  instead of via Websocket.
-
-  Helpful if you need to post a message with fancy formatting, which is not currently supported
-  via the RTM API.
-  """
-  @spec post_message(String.t(), String.t(), String.t(), String.t(), []) :: %{}
-  def post_message(token, author, channel, text, attachments \\ []) do
-    data = [
-      channel: channel,
-      text: text,
-      as_user: author,
-      attachments: attachments |> Poison.encode!()
-    ]
-
-    post("chat.postMessage", token, data)
-  end
-
   # Server
-  def handle_call({:get_rtm_connection, bot_token}, _from, state) do
-    {:reply, rtm_connect(bot_token), state}
-  end
-
   def handle_call({:get_user, user_id}, _from, %{users: users} = state) do
     {:reply, Map.fetch!(users, user_id), state}
   end
@@ -131,11 +127,6 @@ defmodule DasBot.Slack do
   def handle_call({:add_reaction, channel, ts, reaction}, _from, %{token: token} = state) do
     data = [channel: channel, timestamp: ts, name: reaction]
     {:reply, post("reactions.add", token, data), state}
-  end
-
-  defp rtm_connect(token) do
-    %{url: url, self: %{id: id, name: name}} = post("rtm.connect", token)
-    {url, id, name}
   end
 
   defp fetch_users(token) do

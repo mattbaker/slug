@@ -14,11 +14,9 @@ defmodule DasBot.Slug do
 
   ## The Slug Pipeline
 
-  Many slugs are strung together inside of `DasBot.Bot` module to build a slug pipeline.
+  Many slugs are strung together inside of a `DasBot.Bot` module to build a slug pipeline.
 
   A bot's pipeline of slugs defines how a bot reacts to events coming from the Slack [RTM API](https://api.slack.com/rtm).
-
-  Check out the `DasBot.Bot` docs for an example of a bot with a slug pipeline.
 
   ## Kinds of Slugs
   There are two kind of slugs: function slugs and module slugs.
