@@ -1,10 +1,10 @@
-defmodule DasBot.Slug.Common.FilterSelf do
+defmodule ExBot.Slug.Common.FilterSelf do
   @moduledoc """
   Filters out events produced by the bot itself. Helpful if you want to ignore
   any events your bot is generating.
   """
-  @behaviour DasBot.Slug
-  alias DasBot.Event
+  @behaviour ExBot.Slug
+  alias ExBot.Event
 
   @impl true
   def call(%Event{bot_id: bot_id, data: %{user: bot_id}}, _bot), do: :halt

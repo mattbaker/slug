@@ -1,13 +1,13 @@
-defmodule DasBot.Application do
+defmodule ExBot.Application do
   @moduledoc false
 
   use Application
 
   def start(_type, _args) do
     Supervisor.start_link(
-      [DasBot.Slack.Supervisor],
+      [ExBot.Slack.Supervisor],
       strategy: :one_for_one,
-      name: DasBot.Supervisor
+      name: ExBot.Supervisor
     )
   end
 end

@@ -1,8 +1,8 @@
-defmodule DasBot.Slug.Common.CheckMentionedTest do
+defmodule ExBot.Slug.Common.CheckMentionedTest do
   use ExUnit.Case
-  doctest DasBot.Slug.Common.CheckMentioned
-  alias DasBot.Slug.Common.CheckMentioned
-  alias DasBot.Event
+  doctest ExBot.Slug.Common.CheckMentioned
+  alias ExBot.Slug.Common.CheckMentioned
+  alias ExBot.Event
 
   test "sets mentioned: true if bot is mentioned" do
     event =

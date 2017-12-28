@@ -1,4 +1,4 @@
-defmodule DasBot.Slack do
+defmodule ExBot.Slack do
   @moduledoc """
   This module provides access to a few Slack Web API calls, as well as maintaining
   a cache of user and channel information for quick lookups.
@@ -9,7 +9,7 @@ defmodule DasBot.Slack do
   # Client
   @doc false
   def start_link([]) do
-    token = DasBot.get_api_token(:web_api)
+    token = ExBot.get_api_token(:web_api)
     GenServer.start_link(__MODULE__, token, name: __MODULE__)
   end
 
@@ -33,7 +33,7 @@ defmodule DasBot.Slack do
   ## Example
 
   ```
-  {url, bot_id, bot_name} = DasBot.Slack.get_rtm_connection("xo-my-token")
+  {url, bot_id, bot_name} = ExBot.Slack.get_rtm_connection("xo-my-token")
   ```
   """
   @spec get_rtm_connection(String.t()) :: {String.t(), String.t(), String.t()}
@@ -97,7 +97,7 @@ defmodule DasBot.Slack do
     text: "Hello world",
     ts: "1355517523.000005"
   }
-  DasBot.Slack.add_reaction(msg.channel, msg.ts, "thumbsup")
+  ExBot.Slack.add_reaction(msg.channel, msg.ts, "thumbsup")
   ```
   """
   @spec add_reaction(String.t(), String.t(), String.t()) :: %{}

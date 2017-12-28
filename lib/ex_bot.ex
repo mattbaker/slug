@@ -1,9 +1,9 @@
-defmodule DasBot do
+defmodule ExBot do
   @moduledoc false
 
   @doc false
   def get_env(key) do
-    Application.get_env(:das_bot, key)
+    Application.get_env(:ex_bot, key)
   end
 
   @doc false

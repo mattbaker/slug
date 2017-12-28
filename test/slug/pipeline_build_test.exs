@@ -1,8 +1,8 @@
-defmodule DasBot.Slug.PipelineBuilderTest do
+defmodule ExBot.Slug.PipelineBuilderTest do
   use ExUnit.Case
-  doctest DasBot.Slug.PipelineBuilder
-  alias DasBot.Event
-  alias DasBot.Slug.PipelineBuilder
+  doctest ExBot.Slug.PipelineBuilder
+  alias ExBot.Event
+  alias ExBot.Slug.PipelineBuilder
 
   describe "execute_pipeline" do
     test "runs slug pipeline" do
@@ -13,7 +13,7 @@ defmodule DasBot.Slug.PipelineBuilderTest do
         :example_function_slug
       ]
 
-      event = PipelineBuilder.execute_pipeline(slugs, test_event(), DasBot.Test.Support.TestBot)
+      event = PipelineBuilder.execute_pipeline(slugs, test_event(), ExBot.Test.Support.TestBot)
 
       assert event ==
                test_event(%{Foo => true, Bar => true, Baz => true, :example_function_slug => true})
@@ -36,7 +36,7 @@ defmodule DasBot.Slug.PipelineBuilderTest do
         create_test_slug(Baz)
       ]
 
-      event = PipelineBuilder.execute_pipeline(slugs, test_event(), DasBot.Test.Support.TestBot)
+      event = PipelineBuilder.execute_pipeline(slugs, test_event(), ExBot.Test.Support.TestBot)
 
       assert event == test_event(%{Foo => true, Bar => true})
 

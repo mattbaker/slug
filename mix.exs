@@ -1,11 +1,11 @@
-defmodule DasBot.MixProject do
+defmodule ExBot.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :das_bot,
+      app: :ex_bot,
       version: "0.1.1",
-      name: "DasBot",
+      name: "ExBot",
       description: "Like Plug, but for Slack Bots.",
       package: package(),
       maintainers: "",
@@ -20,7 +20,7 @@ defmodule DasBot.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {DasBot.Application, []}
+      mod: {ExBot.Application, []}
     ]
   end
 
@@ -38,7 +38,7 @@ defmodule DasBot.MixProject do
     %{
       licenses: ["MIT License"],
       maintainers: ["Matt Baker"],
-      links: %{"GitHub" => "https://github.com/mattbaker/das-bot"}
+      links: %{"GitHub" => "https://github.com/mattbaker/ex-bot"}
     }
   end
 

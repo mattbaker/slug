@@ -1,4 +1,4 @@
-defmodule DasBot.Slug do
+defmodule ExBot.Slug do
   @moduledoc """
 
   The slug specification. Slugs are like [Plug](https://github.com/elixir-plug/plug)s, but for Slack.
@@ -10,11 +10,11 @@ defmodule DasBot.Slug do
    * Optionally annotate the event they received with metadata that may be helpful to other slugs.
    * Return the event, passing it on to the next slug in the pipeline.
 
-  In addition to the documentation below, check out the bundled slugs and associated tests under the `DasBot.Slug.Common` namespace for examples.
+  In addition to the documentation below, check out the bundled slugs and associated tests under the `ExBot.Slug.Common` namespace for examples.
 
   ## The Slug Pipeline
 
-  Many slugs are strung together inside of a `DasBot.Bot` module to build a slug pipeline.
+  Many slugs are strung together inside of a `ExBot.Bot` module to build a slug pipeline.
 
   A bot's pipeline of slugs defines how a bot reacts to events coming from the Slack [RTM API](https://api.slack.com/rtm).
 
@@ -23,15 +23,15 @@ defmodule DasBot.Slug do
 
   ### Function slugs
 
-  A function slug is any function that receives a `DasBot.Event` and returns a `DasBot.Event` or `:halt`.
+  A function slug is any function that receives a `ExBot.Event` and returns a `ExBot.Event` or `:halt`.
   Its type signature must be:
 
-      (DasBot.Event.t) :: DasBot.Event.t
+      (ExBot.Event.t) :: ExBot.Event.t
 
   ### Module slugs
 
   A module slug is an extension of the function slug. The API expected by a module slug is defined as a behaviour by the
-  `DasBot.Slug` module (this module), specifically the export of `c:call/2`.
+  `ExBot.Slug` module (this module), specifically the export of `c:call/2`.
 
   ## Examples
 
@@ -41,7 +41,7 @@ defmodule DasBot.Slug do
   occurred, so this slug also makes a note in the metadata that it inspected the event.
 
   ```
-  def simple_reply(%DasBot.Event{data: %{user: user_id, channel: channel_id}} = event) do
+  def simple_reply(%ExBot.Event{data: %{user: user_id, channel: channel_id}} = event) do
     IO.inspect("Event from \#{user_id} in channel \#{channel_id}: \#{inspect(event)}")
     event |> Event.add_metadata(:got_inspected, true)
   end
@@ -50,21 +50,21 @@ defmodule DasBot.Slug do
   ### Module Slug
 
   Here's an example of a module slug that checks if the bot was mentioned
-  in a Slack message and annotates the `DasBot.Event`'s metadata accordingly.
+  in a Slack message and annotates the `ExBot.Event`'s metadata accordingly.
 
   ```
-  defmodule DasBot.Slug.Common.CheckMentioned do
-    @behaviour DasBot.Slug
+  defmodule ExBot.Slug.Common.CheckMentioned do
+    @behaviour ExBot.Slug
 
     def call(event, _bot) do
-      %DasBot.Event{
+      %ExBot.Event{
         bot_id: bot_id,
         data: %{text: message},
         metadata: %{bot_name: bot_name}
       } = event
 
       is_mentioned = Regex.match?(~r/.*(<@\#{bot_id}>|@\#{bot_name}).*/, message)
-      event |> DasBot.Event.add_metadata(:mentioned, is_mentioned)
+      event |> ExBot.Event.add_metadata(:mentioned, is_mentioned)
     end
   end
   ```
@@ -75,7 +75,7 @@ defmodule DasBot.Slug do
   a catch-all clause that passes on any event that is not recognized.
 
   ```
-  def simple_slug(%DasBot.Event{data: %{user: "UTEST"}} = event) do
+  def simple_slug(%ExBot.Event{data: %{user: "UTEST"}} = event) do
     IO.puts("The test user produced an event")
     event
   end
@@ -88,10 +88,10 @@ defmodule DasBot.Slug do
 
   """
   @doc """
-  Takes a `DasBot.Event` and the `DasBot.Bot` module that received the event.
-  Must return a `DasBot.Event` or `:halt`.
+  Takes a `ExBot.Event` and the `ExBot.Bot` module that received the event.
+  Must return a `ExBot.Event` or `:halt`.
 
   Returning `:halt` will abort the pipeline execution, and subsequent slugs in the pipeline will not be run.
   """
-  @callback call(event :: DasBot.Event.t(), bot :: DasBot.Bot.t()) :: DasBot.Event.t() | :halt
+  @callback call(event :: ExBot.Event.t(), bot :: ExBot.Bot.t()) :: ExBot.Event.t() | :halt
 end

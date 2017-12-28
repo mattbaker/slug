@@ -1,11 +1,11 @@
-defmodule DasBot.Slug.Common.Peek do
+defmodule ExBot.Slug.Common.Peek do
   @moduledoc """
   Helpful for debugging. This slug will inspect the event that is moving through
   the pipeline and log it out with `Logger.info`. The event will not be
   changed.
   """
   require Logger
-  @behaviour DasBot.Slug
+  @behaviour ExBot.Slug
 
   @impl true
   def call(event, bot) do

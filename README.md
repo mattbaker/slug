@@ -1,11 +1,11 @@
-# DasBot
+# ExBot
 
-DasBot is like [Plug](https://github.com/elixir-plug/plug), but for Slack.
+ExBot is like [Plug](https://github.com/elixir-plug/plug), but for Slack.
 Your bot module defines a pipeline of functions (slugs) that receive events from Slack. Each slug can take actions in response to the events it receives, and may optionally add metadata to an event for other slugs to use downstream. This is similar to Plug and its `conn` object.
 
-DasBot connects and communicates over websocket using Slack's [RTM API](https://api.slack.com/rtm). A simple `DasBot.Slack` process also provides access to a few handy Web API calls, and maintains a cache of user and channel information for quick lookups.
+ExBot connects and communicates over websocket using Slack's [RTM API](https://api.slack.com/rtm). A simple `ExBot.Slack` process also provides access to a few handy Web API calls, and maintains a cache of user and channel information for quick lookups.
 
-Hex docs for DasBot are available [here](https://hexdocs.pm/das_bot).
+Hex docs for ExBot are available [here](https://hexdocs.pm/ex_bot).
 
 ## Installation and example
 
@@ -15,31 +15,31 @@ Start a new project.
 mix new bot_family --sup
 ```
 
-Add `DasBot` to your deps, then run `mix deps.get`.
+Add `ExBot` to your deps, then run `mix deps.get`.
 
 ```elixir
 def deps do
   [
-    {:das_bot, "~> 0.1.0"}
+    {:ex_bot, "~> 0.1.0"}
   ]
 end
 ```
 
 #### Create your Bot
-Create a new module for your bot, pull in `DasBot.Bot`, and define a simple pipeline of slugs.
+Create a new module for your bot, pull in `ExBot.Bot`, and define a simple pipeline of slugs.
 
 ```elixir
 # lib/bot_family/my_bot.ex
 defmodule BotFamily.MyBot do
-  use DasBot.Bot
+  use ExBot.Bot
 
-  slug(DasBot.Slug.Common.MessagesOnly)
-  slug(DasBot.Slug.Common.CheckMentioned)
+  slug(ExBot.Slug.Common.MessagesOnly)
+  slug(ExBot.Slug.Common.CheckMentioned)
   slug(:simple_reply)
 
-  def simple_reply(%DasBot.Event{data: event_data, metadata: %{mentioned: true}} = event) do
+  def simple_reply(%ExBot.Event{data: event_data, metadata: %{mentioned: true}} = event) do
     %{user: user_id, channel: channel_id} = event_data
-    DasBot.Bot.send_text(__MODULE__, channel_id, "Oh hey, <@#{user_id}>!")
+    ExBot.Bot.send_text(__MODULE__, channel_id, "Oh hey, <@#{user_id}>!")
     event
   end
 
@@ -47,13 +47,13 @@ defmodule BotFamily.MyBot do
 end
 ```
 
-What's going on here? In our example bot we're using the included `DasBot.Slug.Common.MessagesOnly` slug module to filter out events that are _not_ message events. 
+What's going on here? In our example bot we're using the included `ExBot.Slug.Common.MessagesOnly` slug module to filter out events that are _not_ message events. 
 
-Next we use the included `DasBot.Slug.Common.MessagesOnly` slug, which will check to see if our bot was mentioned in the message we just received. It will add a `mentioned` key to the metadata. 
+Next we use the included `ExBot.Slug.Common.MessagesOnly` slug, which will check to see if our bot was mentioned in the message we just received. It will add a `mentioned` key to the metadata. 
 
-Finally, we supply our own slug called `simple_reply`. If it's been mentioned, it will send a reply to the user that mentioned it in the channel using `DasBot.Bot.send_text/3`. If not, it will simply pass the event along.
+Finally, we supply our own slug called `simple_reply`. If it's been mentioned, it will send a reply to the user that mentioned it in the channel using `ExBot.Bot.send_text/3`. If not, it will simply pass the event along.
 
-Check out the documentation in the `DasBot.Slug` module for more information on creating your own slugs.
+Check out the documentation in the `ExBot.Slug` module for more information on creating your own slugs.
 
 #### Configure your keys
 Before we try out our bot, we need to configure the api keys for our bot in `confix/config.exs`, and for the Slack Web API. In our case, we'll use the same token for both.
@@ -62,7 +62,7 @@ Before we try out our bot, we need to configure the api keys for our bot in `con
 # config/config.exs
 use Mix.Config
 
-config :das_bot,
+config :ex_bot,
   keys: %{
     :web_api => "xoxb-your-key",
     BotFamily.MyBot => "xoxb-your-key"
@@ -80,10 +80,10 @@ iex(1)> BotFamily.MyBot.start_link()
 10:52:55.558 [info]  Elixir.MyBot: Initializing Websocket
 {:ok, #PID<0.253.0>}
 
-iex(1)> DasBot.Bot.send_to_channel(BotFamily.MyBot, "general", "hello world")
+iex(1)> ExBot.Bot.send_to_channel(BotFamily.MyBot, "general", "hello world")
 ```
 
-Check out the documentation in the `DasBot.Bot` module for more information on sending messages from your bot.
+Check out the documentation in the `ExBot.Bot` module for more information on sending messages from your bot.
 
 #### Test your slug pipeline
 
