@@ -2,6 +2,10 @@
 
 DasBot is like [Plug](https://github.com/elixir-plug/plug), but for Slack.
 
+Online documentation is available [here](https://hexdocs.pm/das_bot).
+
+## Example
+
 ```elixir
 defmodule MyBot do
   use DasBot.Bot
@@ -16,27 +20,11 @@ defmodule MyBot do
   end
   def simple_reply(event), do: event
 end
-
-defmodule MyBot.Application do
-  @moduledoc false
-
-  use Application
-
-  def start(_type, _args) do
-    children = [
-      {MyBot, token: "xoxb-my-bot-token"}
-    ]
-
-    opts = [strategy: :one_for_one, name: TestBot.Supervisor]
-    Supervisor.start_link(children, opts)
-  end
-end
 ```
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `das_bot` to your list of dependencies in `mix.exs`:
+Add DasBot to your project's dependencies.
 
 ```elixir
 def deps do
@@ -46,7 +34,18 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/das_bot](https://hexdocs.pm/das_bot).
+Start your bot as a worker in your OTP application, passing your slack bot API token as an argument.
 
+```elixir
+defmodule MyBot.Application do
+  @moduledoc false
+
+  use Application
+
+  def start(_type, _args) do
+    children = [{MyBot, token: "xoxb-my-bot-token"}]
+    opts = [strategy: :one_for_one, name: MyBot.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
+```

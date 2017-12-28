@@ -11,7 +11,8 @@ defmodule DasBot.MixProject do
       maintainers: "",
       elixir: "~> 1.6-dev",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      docs: docs()
     ]
   end
 
@@ -36,8 +37,12 @@ defmodule DasBot.MixProject do
   defp package() do
     %{
       licenses: ["MIT License"],
-      maintainers: "Matt Baker",
+      maintainers: ["Matt Baker"],
       links: %{"GitHub" => "https://github.com/mattbaker/das-bot"}
     }
+  end
+
+  defp docs() do
+    [extras: ["README.md"], main: "readme"]
   end
 end
