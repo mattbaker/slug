@@ -49,7 +49,7 @@ end
 
 What's going on here? In our example bot we're using the included `ExBot.Slug.Common.MessagesOnly` slug module to filter out events that are _not_ message events. 
 
-Next we use the included `ExBot.Slug.Common.MessagesOnly` slug, which will check to see if our bot was mentioned in the message we just received. It will add a `mentioned` key to the metadata. 
+Next we use the included `ExBot.Slug.Common.CheckMentioned` slug, which will check to see if our bot was mentioned in the message we just received. It will add a `mentioned` key to the metadata. 
 
 Finally, we supply our own slug called `simple_reply`. If it's been mentioned, it will send a reply to the user that mentioned it in the channel using `ExBot.Bot.send_text/3`. If not, it will simply pass the event along.
 
