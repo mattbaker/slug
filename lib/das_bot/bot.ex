@@ -12,7 +12,7 @@ defmodule DasBot.Bot do
     slug(DasBot.Slug.Common.CheckMentioned) # Check if the bot has been mentioned.
     slug(:simple_reply) # An implementation of a function-based `DasBot.Slug`.
 
-    def simple_reply(%DasBot.Slug.Event{data: %{user: user_id}, metadata: %{mentioned: true}} = event) do
+    def simple_reply(%DasBot.Event{data: %{user: user_id}, metadata: %{mentioned: true}} = event) do
       DasBot.Bot.send_to_channel(__MODULE__, "general", "Oh hey, <@\#{user_id}>!")
       event
     end
