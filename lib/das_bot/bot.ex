@@ -1,18 +1,92 @@
 defmodule DasBot.Bot do
-  @callback on_connect(%{atom => any()}) :: {atom, any()}
+  @moduledoc """
+  This module can be `use`-d into a module in order to define a Slack bot.
+
+  The behavior of a bot is defined by its pipeline of `DasBot.Slug`s.
+
+  ```
+  defmodule MyBot do
+    use DasBot.Bot
+
+    slug(DasBot.Slug.Common.MessagesOnly) # Filter out events that are not messages.
+    slug(DasBot.Slug.Common.CheckMentioned) # Check if the bot has been mentioned.
+    slug(:simple_reply) # An implementation of a function-based `DasBot.Slug`.
+
+    def simple_reply(%DasBot.Slug.Event{data: %{user: user_id}, metadata: %{mentioned: true}} = event) do
+      DasBot.Bot.send_to_channel(__MODULE__, "general", "Oh hey, <@\#{user_id}>!")
+      event
+    end
+
+    # Simply pass along the event if our clause above does not match
+    def simple_reply(event), do: event
+  end
+  ```
+
+  See the `DasBot.Slug` specification for more information on creating your own
+  slugs.
+  """
+
+  @doc """
+  Runs when the bot's websocket connection to Slack is first established. This callback is optional.
+
+  ## Example
+  ```
+  def on_connect(state) do
+    IO.puts("I have connected!")
+    {:ok, state}
+  end
+  ```
+  """
+  @callback on_connect(state :: state) :: {atom, state}
   @optional_callbacks on_connect: 1
+
+  @typedoc false
+  @type t :: module()
+
+  @typedoc false
+  @type state :: %{atom => any()}
 
   alias DasBot.Slack
 
-  def send_to_channel(bot, channel, msg) do
-    %{id: cid} = Slack.get_channel_by_name(channel)
+  @doc """
+  Sends a message from a bot to a channel, identified by name.
+
+  ## Example
+
+  ```
+  DasBot.Bot.send_to_channel(MyBot, "general", "Hello world")
+  ```
+  """
+  @spec send_to_channel(t(), String.t(), String.t()) :: any()
+  def send_to_channel(bot, channel_name, msg) do
+    %{id: cid} = Slack.get_channel_by_name(channel_name)
     send_text(bot, cid, msg)
   end
 
+  @doc """
+  Sends a message from a bot to a channel, identified by id.
+
+  ## Example
+
+  ```
+  DasBot.Bot.send_text(MyBot, "C0G9QF9GW", "Hello world")
+  ```
+  """
+  @spec send_text(t(), String.t(), String.t()) :: any()
   def send_text(bot, channel_id, text) do
     send_event(bot, %{type: "message", channel: channel_id, text: text})
   end
 
+  @doc """
+  Sends an arbitrary JSON payload to Slack from a bot.
+
+  ## Example
+
+  ```
+  DasBot.Bot.send_event(MyBot, %{type: "message", channel: "C0G9QF9GW", text: "Hello world"})
+  ```
+  """
+  @spec send_event(t(), %{atom => any()}) :: any()
   def send_event(bot, event) do
     cast(bot, {:text, Poison.encode!(event)})
   end

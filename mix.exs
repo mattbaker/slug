@@ -24,7 +24,8 @@ defmodule DasBot.MixProject do
     [
       {:poison, "~> 3.0"},
       {:httpoison, "~> 0.13"},
-      {:websocket_client, "~> 1.3.0", manager: :rebar}
+      {:websocket_client, "~> 1.3.0", manager: :rebar},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
 end

@@ -1,7 +1,7 @@
 defmodule DasBot.Slug.PipelineBuilderTest do
   use ExUnit.Case
   doctest DasBot.Slug.PipelineBuilder
-  alias DasBot.Slug.Event
+  alias DasBot.Event
   alias DasBot.Slug.PipelineBuilder
 
   describe "execute_pipeline" do

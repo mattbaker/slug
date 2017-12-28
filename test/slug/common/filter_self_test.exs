@@ -2,7 +2,7 @@ defmodule DasBot.Slug.Common.FilterSelfTest do
   use ExUnit.Case
   doctest DasBot.Slug.Common.FilterSelf
   alias DasBot.Slug.Common.FilterSelf
-  alias DasBot.Slug.Event
+  alias DasBot.Event
 
   test "filters events originating from the bot itself" do
     result =

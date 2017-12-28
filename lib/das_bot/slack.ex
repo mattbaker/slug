@@ -3,10 +3,19 @@ defmodule DasBot.Slack do
   require Logger
 
   # Client
+  @doc false
   def start_link(token: token) do
     GenServer.start_link(__MODULE__, token, name: __MODULE__)
   end
 
+  @doc """
+  Invoked when the `DasBot.Slack` GenServer is started. Expects
+  a Slack API token.
+
+  A list of users and channels will be fetched and cached when `init()`
+  runs.
+  """
+  @spec init(token :: String.t()) :: {:ok, %{}}
   def init(token) do
     state = %{
       users: fetch_users(token),
@@ -17,24 +26,83 @@ defmodule DasBot.Slack do
     {:ok, state}
   end
 
+  @doc """
+  Requests a [Real Time Messaging session](https://api.slack.com/methods/rtm.connect)
+  from Slack. Returns a tuple containing the websocket URL, the id of the bot
+  requesting the session, and the name of the bot requesting the session.
+
+  ## Example
+
+  ```
+  {url, bot_id, bot_name} = DasBot.Slack.get_rtm_connection("xo-my-token")
+  ```
+  """
+  @spec get_rtm_connection(String.t()) :: {String.t(), String.t(), String.t()}
   def get_rtm_connection(bot_token) do
     GenServer.call(__MODULE__, {:get_rtm_connection, bot_token})
   end
 
+  @doc """
+  Get information about the user identified by `user_id`.
+  """
   def get_user(user_id) do
     GenServer.call(__MODULE__, {:get_user, user_id})
   end
 
+  @doc """
+  Fetch channel information by the channel's ID, ex. "C2147483705".
+  """
+  @spec get_channel(String.t()) :: %{}
   def get_channel(channel_id) do
     GenServer.call(__MODULE__, {:get_channel, channel_id})
   end
 
+  @doc """
+  Fetch channel information by the channel's name, ex. "general".
+  """
+  @spec get_channel_by_name(String.t()) :: %{}
   def get_channel_by_name(channel_name) do
     GenServer.call(__MODULE__, {:get_channel_by_name, channel_name})
   end
 
-  def add_reaction(channel, ts, reaction) do
-    GenServer.call(__MODULE__, {:add_reaction, channel, ts, reaction})
+  @doc """
+  Add a reaction to a message. The timestamp of the message should be part of the
+  message's event.
+
+  ## Example
+  ```
+  msg = %{
+    type: "message",
+    channel: "C2147483705",
+    user: "U2147483697",
+    text: "Hello world",
+    ts: "1355517523.000005"
+  }
+  DasBot.Slack.add_reaction(msg.channel, msg.ts, "thumbsup")
+  ```
+  """
+  @spec add_reaction(String.t(), String.t(), String.t()) :: %{}
+  def add_reaction(channel, message_timestamp, reaction) do
+    GenServer.call(__MODULE__, {:add_reaction, channel, message_timestamp, reaction})
+  end
+
+  @doc """
+  Posts a message through the [Slack REST API](https://api.slack.com/methods/chat.postMessage)
+  instead of via Websocket.
+
+  Helpful if you need to post a message with fancy formatting, which is not currently supported
+  via the RTM API.
+  """
+  @spec post_message(String.t(), String.t(), String.t(), String.t(), []) :: %{}
+  def post_message(token, author, channel, text, attachments \\ []) do
+    data = [
+      channel: channel,
+      text: text,
+      as_user: author,
+      attachments: attachments |> Poison.encode!()
+    ]
+
+    post("chat.postMessage", token, data)
   end
 
   # Server
@@ -63,17 +131,6 @@ defmodule DasBot.Slack do
   def handle_call({:add_reaction, channel, ts, reaction}, _from, %{token: token} = state) do
     data = [channel: channel, timestamp: ts, name: reaction]
     {:reply, post("reactions.add", token, data), state}
-  end
-
-  def post_message(token, author, channel, text, attachments \\ []) do
-    data = [
-      channel: channel,
-      text: text,
-      as_user: author,
-      attachments: attachments |> Poison.encode!()
-    ]
-
-    post("chat.postMessage", token, data)
   end
 
   defp rtm_connect(token) do

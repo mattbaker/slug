@@ -1,5 +1,5 @@
 defmodule DasBot.Test.Support.TestBot do
-  alias DasBot.Slug.Event
+  alias DasBot.Event
 
   def example_function_slug(event) do
     send(self(), :example_function_slug)

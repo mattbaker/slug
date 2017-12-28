@@ -1,6 +1,10 @@
 defmodule DasBot.Slug.PipelineBuilder do
+  @moduledoc """
+  Tools for building a pipeline of slugs. This is used by `DasBot.Bot` and isn't
+  intended to be used directly.
+  """
   @type slug :: module | atom
-  alias DasBot.Slug.Event
+  alias DasBot.Event
 
   defmacro __using__(_params) do
     quote do
@@ -26,12 +30,36 @@ defmodule DasBot.Slug.PipelineBuilder do
     end
   end
 
+  @doc """
+  Adds a slug to the module's slug pipeline.
+
+  ## Example
+
+  ```
+  defmodule MyPipeline do
+    use DasBot.PipelineBuilder
+
+    slug(ModulePlug)
+    slug(:function_plug)
+
+    def function_plug(event, _bot) do
+      event
+    end
+  end
+  ```
+  """
+  @spec slug(slug) :: any()
   defmacro slug(slug) do
     quote do
       @slugs unquote(slug)
     end
   end
 
+  @doc """
+  Executes the module's slug pipeline. Given an initial `DasBot.Event`, each slug will be executed,
+  and the result of the slug's execution will become the input for the next slug.
+  """
+  @spec execute_pipeline(list(slug), DasBot.Event.t(), DasBot.Bot.t()) :: DasBot.Event.t()
   def execute_pipeline(slugs, initial_event, bot_module) do
     Enum.reduce_while(slugs, initial_event, fn slug, current_event ->
       case execute_slug(slug, current_event, bot_module) do

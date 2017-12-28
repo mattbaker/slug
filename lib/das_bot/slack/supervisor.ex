@@ -1,4 +1,6 @@
 defmodule DasBot.Slack.Supervisor do
+  @moduledoc false
+
   use Supervisor
   alias DasBot.Slack
 

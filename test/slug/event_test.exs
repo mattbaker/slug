@@ -1,7 +1,7 @@
-defmodule DasBot.Slug.EventTest do
+defmodule DasBot.EventTest do
   use ExUnit.Case
-  doctest DasBot.Slug.Event
-  alias DasBot.Slug.Event
+  doctest DasBot.Event
+  alias DasBot.Event
 
   describe "add_metadata" do
     test "attaches k-v pairs" do

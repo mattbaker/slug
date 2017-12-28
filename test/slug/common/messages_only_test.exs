@@ -2,7 +2,7 @@ defmodule DasBot.Slug.Common.MessagesOnlyTest do
   use ExUnit.Case
   doctest DasBot.Slug.Common.MessagesOnly
   alias DasBot.Slug.Common.MessagesOnly
-  alias DasBot.Slug.Event
+  alias DasBot.Event
 
   test "allows events of type message" do
     result =
