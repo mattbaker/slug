@@ -1,9 +1,9 @@
-defmodule ExBot do
+defmodule Slug.Util do
   @moduledoc false
 
   @doc false
   def get_env(key) do
-    Application.get_env(:ex_bot, key)
+    Application.get_env(:slug, key)
   end
 
   @doc false

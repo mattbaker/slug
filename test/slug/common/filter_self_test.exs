@@ -1,8 +1,8 @@
-defmodule ExBot.Slug.Common.FilterSelfTest do
+defmodule Slug.Common.FilterSelfTest do
   use ExUnit.Case
-  doctest ExBot.Slug.Common.FilterSelf
-  alias ExBot.Slug.Common.FilterSelf
-  alias ExBot.Event
+  doctest Slug.Common.FilterSelf
+  alias Slug.Common.FilterSelf
+  alias Slug.Event
 
   test "filters events originating from the bot itself" do
     result =

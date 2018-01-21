@@ -1,8 +1,8 @@
-defmodule ExBot.Slack.Supervisor do
+defmodule Slug.Slack.Supervisor do
   @moduledoc false
 
   use Supervisor
-  alias ExBot.Slack
+  alias Slug.Slack
 
   def start_link([]) do
     Supervisor.start_link(__MODULE__, [], [])

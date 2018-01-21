@@ -1,16 +1,16 @@
-defmodule ExBot.Slug.Common.CheckMentioned do
+defmodule Slug.Common.CheckMentioned do
   @moduledoc """
   A slug that checks if the bot has been mentioned.
 
-  Attaches the key `:mentioned` to the `ExBot.Event`'s metadata with the value
+  Attaches the key `:mentioned` to the `Slug.Event`'s metadata with the value
   `true` if the bot was mentioned in this message, and `false` if it was not.
 
-  Expects `ExBot.Event` to be a message, you may need to filter non-message events
-  out of the pipeline before using this. See `ExBot.Slug.Common.MessagesOnly`.
+  Expects `Slug.Event` to be a message, you may need to filter non-message events
+  out of the pipeline before using this. See `Slug.Common.MessagesOnly`.
 
   """
-  @behaviour ExBot.Slug
-  alias ExBot.Event
+  @behaviour Slug
+  alias Slug.Event
 
   @impl true
   def call(event, _bot) do

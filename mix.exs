@@ -1,15 +1,15 @@
-defmodule ExBot.MixProject do
+defmodule Slug.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :ex_bot,
+      app: :slug,
       version: "0.1.1",
-      name: "ExBot",
+      name: "Slug",
       description: "Like Plug, but for Slack Bots.",
       package: package(),
       maintainers: "",
-      elixir: "~> 1.6-dev",
+      elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: docs()
@@ -20,7 +20,7 @@ defmodule ExBot.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {ExBot.Application, []}
+      mod: {Slug.Application, []}
     ]
   end
 
@@ -38,7 +38,7 @@ defmodule ExBot.MixProject do
     %{
       licenses: ["MIT License"],
       maintainers: ["Matt Baker"],
-      links: %{"GitHub" => "https://github.com/mattbaker/ex-bot"}
+      links: %{"GitHub" => "https://github.com/mattbaker/slug"}
     }
   end
 

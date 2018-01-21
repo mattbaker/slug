@@ -1,4 +1,4 @@
-defmodule ExBot.Bot do
+defmodule Slug.Bot do
   @moduledoc """
   This module can be `use`-d into a module in order to define a Slack bot.
   It also includes functions for sending messages and events from a bot to
@@ -13,7 +13,7 @@ defmodule ExBot.Bot do
   @typedoc false
   @type state :: %{atom => any()}
 
-  alias ExBot.Slack
+  alias Slug.Slack
 
   @doc """
   Sends a message from a bot to a channel, identified by name.
@@ -21,7 +21,7 @@ defmodule ExBot.Bot do
   ## Example
 
   ```
-  ExBot.Bot.send_to_channel(MyBot, "general", "Hello world")
+  Slug.Bot.send_to_channel(MyBot, "general", "Hello world")
   ```
   """
   @spec send_to_channel(t(), String.t(), String.t()) :: any()
@@ -36,7 +36,7 @@ defmodule ExBot.Bot do
   ## Example
 
   ```
-  ExBot.Bot.send_text(MyBot, "C0G9QF9GW", "Hello world")
+  Slug.Bot.send_text(MyBot, "C0G9QF9GW", "Hello world")
   ```
   """
   @spec send_text(t(), String.t(), String.t()) :: any()
@@ -50,7 +50,7 @@ defmodule ExBot.Bot do
   ## Example
 
   ```
-  ExBot.Bot.send_event(MyBot, %{type: "message", channel: "C0G9QF9GW", text: "Hello world"})
+  Slug.Bot.send_event(MyBot, %{type: "message", channel: "C0G9QF9GW", text: "Hello world"})
   ```
   """
   @spec send_event(t(), %{atom => any()}) :: any()
@@ -66,15 +66,15 @@ defmodule ExBot.Bot do
   defmacro __using__(_params) do
     quote do
       require Logger
-      use ExBot.Slug.PipelineBuilder
+      use Slug.PipelineBuilder
 
-      @behaviour ExBot.Bot
+      @behaviour Slug.Bot
       @behaviour :websocket_client
       @keepalive 10_000
 
       # Client
       def start_link() do
-        ExBot.get_api_token(__MODULE__)
+        Slug.Util.get_api_token(__MODULE__)
         |> start_websocket(!!System.get_env("NO_BOT_START"))
       end
 

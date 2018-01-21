@@ -1,5 +1,5 @@
-defmodule ExBot.Test.Support.TestBot do
-  alias ExBot.Event
+defmodule Slug.Test.Support.TestBot do
+  alias Slug.Event
 
   def example_function_slug(event) do
     send(self(), :example_function_slug)

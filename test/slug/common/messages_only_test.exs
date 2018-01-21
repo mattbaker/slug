@@ -1,8 +1,8 @@
-defmodule ExBot.Slug.Common.MessagesOnlyTest do
+defmodule Slug.Common.MessagesOnlyTest do
   use ExUnit.Case
-  doctest ExBot.Slug.Common.MessagesOnly
-  alias ExBot.Slug.Common.MessagesOnly
-  alias ExBot.Event
+  doctest Slug.Common.MessagesOnly
+  alias Slug.Common.MessagesOnly
+  alias Slug.Event
 
   test "allows events of type message" do
     result =

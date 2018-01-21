@@ -1,7 +1,7 @@
-defmodule ExBot.EventTest do
+defmodule Slug.EventTest do
   use ExUnit.Case
-  doctest ExBot.Event
-  alias ExBot.Event
+  doctest Slug.Event
+  alias Slug.Event
 
   describe "add_metadata" do
     test "attaches k-v pairs" do
